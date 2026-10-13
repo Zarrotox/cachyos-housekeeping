@@ -313,7 +313,6 @@ detect_target_user() {
 
 TARGET_USER=$(detect_target_user)
 TARGET_UID=$(id -u "$TARGET_USER")
-TARGET_GID=$(id -g "$TARGET_USER")
 TARGET_GROUP=$(id -gn "$TARGET_USER" 2>/dev/null || id -un "$TARGET_USER")
 TARGET_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6)
 

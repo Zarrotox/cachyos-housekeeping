@@ -49,13 +49,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Linting & Packaging Tools
+      - name: Install Packaging Dependencies
         run: |
-          pacman -Syu --noconfirm --needed pacman-contrib namcap git
+          pacman -Syu --noconfirm --needed pacman-contrib namcap git sudo
+
+      - name: Configure Non-Root Build User
+        run: |
+          useradd -m -s /bin/bash builduser
+          echo "builduser ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/builduser
+          chmod 0440 /etc/sudoers.d/builduser
+          chown -R builduser:builduser "$GITHUB_WORKSPACE"
+          sudo -u builduser git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Verify .SRCINFO Synchronization
         run: |
-          makepkg --printsrcinfo > .SRCINFO.generated
+          sudo -u builduser sh -c "makepkg --printsrcinfo > .SRCINFO.generated"
           if ! diff -u .SRCINFO .SRCINFO.generated; then
             echo "ERROR: .SRCINFO is out of sync with PKGBUILD. Run 'makepkg --printsrcinfo > .SRCINFO'."
             exit 1
@@ -64,4 +72,4 @@ jobs:
 
       - name: Lint PKGBUILD with Namcap
         run: |
-          namcap PKGBUILD
+          sudo -u builduser namcap PKGBUILD
