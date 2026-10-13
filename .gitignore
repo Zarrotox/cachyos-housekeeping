@@ -1,0 +1,17 @@
+# Logs and audit files
+*.log
+/var/log/
+
+# Backup archives
+*.tar.zst
+*.tar.gz
+*.tar.xz
+*.tar
+
+# System and editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
