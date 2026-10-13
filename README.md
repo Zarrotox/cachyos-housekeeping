@@ -1,30 +1,69 @@
 # CachyOS & KDE Plasma Comprehensive Housekeeping Suite
 
 [![CI](https://github.com/Zarrotox/cachyos-housekeeping/actions/workflows/ci.yml/badge.svg)](https://github.com/Zarrotox/cachyos-housekeeping/actions/workflows/ci.yml)
-[![AUR version](https://img.shields.io/aur/version/cachyos-housekeeping)](https://aur.archlinux.org/packages/cachyos-housekeeping)
 [![Release](https://img.shields.io/github/v/release/Zarrotox/cachyos-housekeeping)](https://github.com/Zarrotox/cachyos-housekeeping/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform: Arch / CachyOS](https://img.shields.io/badge/Platform-CachyOS%20%2F%20Arch%20Linux-00d1b2.svg)](#)
+[![Platform: CachyOS / Arch Linux](https://img.shields.io/badge/Platform-CachyOS%20%2F%20Arch%20Linux-00d1b2.svg)](#)
 
 **Version**: `2026.10.15`  
 **Author**: Zarrotox  
 **Target OS**: CachyOS / Arch Linux with KDE Plasma 6  
 
-**TL;DR:**  
-Run `sudo cachyos-housekeeping` (or `sudo ./cachyos-housekeeping.sh`) for an interactive cleanup,  
-`--safe-mode` for non-destructive maintenance,  
-or `--dry-run` to simulate everything.
+---
+
+**TL;DR:**
+
+```bash
+# Standard interactive cleanup
+sudo cachyos-housekeeping
+
+# Non-destructive safe mode (zero deletions)
+sudo cachyos-housekeeping --safe-mode
+
+# Dry-run simulation (preview reclaimable storage)
+sudo cachyos-housekeeping --dry-run
+```
 
 A hardened, sysadmin-grade Bash maintenance, performance-tuning, and backup automation suite designed for manual execution via `sudo` or automated packaging through the Arch User Repository (AUR).
 
 ---
 
+## Why This Exists
+
+CachyOS and KDE Plasma users often rely on multiple disconnected tools
+for package cleanup, AUR cache maintenance, Steam cache cleanup,
+Flatpak pruning, Baloo maintenance, backups, and filesystem health checks.
+
+CachyOS Housekeeping Suite consolidates those maintenance workflows into
+a single safety-focused utility with:
+
+- Timeshift rollback protection
+- Dry-run simulation
+- Safe Mode execution
+- Steam data preservation safeguards
+- Telemetry and disk reclamation reporting
+- Automated backup generation
+- Btrfs and SSD maintenance
+
+The goal is to provide a repeatable, transparent, and auditable
+housekeeping workflow for power users.
+
+---
+
+## Screenshot
+
+<!-- TODO: Replace with actual screenshot after first production validation run -->
+
+---
+
 ## Table of Contents
 
+- [Why This Exists](#why-this-exists)
+- [Screenshot](#screenshot)
 - [Installation](#installation)
-  - [Method 1: Arch User Repository (AUR)](#method-1-arch-user-repository-aur)
-  - [Method 2: Manual PKGBUILD Build](#method-2-manual-pkgbuild-build)
-  - [Method 3: Standalone Script Clone](#method-3-standalone-script-clone)
+  - [Method 1: Local PKGBUILD Build](#method-1-local-pkgbuild-build)
+  - [Method 2: Standalone Script Installation](#method-2-standalone-script-installation)
+  - [Planned: Arch User Repository (AUR)](#planned-arch-user-repository-aur)
 - [Operational Modes: Standard vs Safe Mode vs Dry-Run](#operational-modes-standard-vs-safe-mode-vs-dry-run)
 - [Interactive Module Selector](#interactive-module-selector)
 - [Steam Orphan Safety & Compatdata Preservation](#steam-orphan-safety--compatdata-preservation)
@@ -34,6 +73,8 @@ A hardened, sysadmin-grade Bash maintenance, performance-tuning, and backup auto
   - [C. Steam Shadercache Performance Monitor](#c-steam-shadercache-performance-monitor)
 - [Prerequisites & Package Requirements](#prerequisites--package-requirements)
 - [CLI Options & Usage Guide](#cli-options--usage-guide)
+  - [CLI Syntax](#cli-syntax)
+  - [Command Examples](#command-examples)
 - [Detailed 5-Step Pipeline](#detailed-5-step-pipeline)
   - [Step 0: Preflight Verification](#step-0-preflight-verification)
   - [Step 1: System Safety (Timeshift Failsafe)](#step-1-system-safety-timeshift-failsafe)
@@ -45,38 +86,36 @@ A hardened, sysadmin-grade Bash maintenance, performance-tuning, and backup auto
 - [Aliases & Shortcuts](#aliases--shortcuts)
 - [Changelog & Documentation](#changelog--documentation)
 - [AUR Publication & Maintenance](#aur-publication--maintenance)
+- [AI Assistance Disclosure](#ai-assistance-disclosure)
 - [License](#license)
 
 ---
 
+> [!WARNING]
+> This utility performs system maintenance operations including package cleanup,
+> cache removal, Steam shader cache cleanup, configuration backups,
+> and filesystem maintenance.
+>
+> Always perform an initial `--dry-run` before first use.
+
 ## Installation
 
-### Method 1: Arch User Repository (AUR)
-The recommended installation method on CachyOS and Arch Linux is via your preferred AUR helper:
+### Method 1: Local PKGBUILD Build
+
+You can build and install the native Arch package locally using `makepkg`:
 
 ```bash
-# Using paru (standard on CachyOS)
-paru -S cachyos-housekeeping
-
-# Using yay
-yay -S cachyos-housekeeping
-```
-
-Once installed, the command `cachyos-housekeeping` and its short alias `cachy-clean` are immediately available system-wide:
-```bash
-sudo cachyos-housekeeping
-# or
-sudo cachy-clean
-```
-
-### Method 2: Manual PKGBUILD Build
-```bash
-git clone https://aur.archlinux.org/cachyos-housekeeping.git
+git clone https://github.com/Zarrotox/cachyos-housekeeping.git
 cd cachyos-housekeeping
 makepkg -si
 ```
 
-### Method 3: Standalone Script Clone
+This installs `/usr/bin/cachyos-housekeeping`, the `/usr/bin/cachy-clean` symlink, license, and documentation into standard system paths.
+
+### Method 2: Standalone Script Installation
+
+You can also install the standalone script directly without `makepkg`:
+
 ```bash
 git clone https://github.com/Zarrotox/cachyos-housekeeping.git
 cd cachyos-housekeeping
@@ -84,26 +123,37 @@ sudo install -Dm755 cachyos-housekeeping.sh /usr/local/bin/cachyos-housekeeping
 sudo ln -sf /usr/local/bin/cachyos-housekeeping /usr/local/bin/cachy-clean
 ```
 
+### Planned: Arch User Repository (AUR)
+
+> [!WARNING]
+> AUR publication is planned but not yet released.
+> The package is currently undergoing final validation testing.
+> Installation via Git clone or manual PKGBUILD is recommended until testing is completed.
+
+Once published, package installation via AUR helpers will be supported:
+
+```bash
+# Future usage:
+# paru -S cachyos-housekeeping
+# yay -S cachyos-housekeeping
+```
+
 ---
 
 ## Operational Modes: Standard vs Safe Mode vs Dry-Run
 
-```
-┌─────────────────────────┬───────────────────┬──────────────────┬─────────────────┐
-│ Feature                 │ Standard Mode     │ Safe Mode (-s)   │ Dry-Run (-d)    │
-├─────────────────────────┼───────────────────┼──────────────────┼─────────────────┤
-│ Timeshift Snapshot      │ Creates snapshot  │ Creates snapshot │ Simulated       │
-│ Btrfs Scrub             │ Executes          │ Executes         │ Simulated       │
-│ SSD fstrim              │ Executes          │ Executes         │ Simulated       │
-│ Journal Vacuum          │ Executes          │ Executes         │ Simulated       │
-│ Config Backup (.tar.zst)│ Creates archive   │ Creates archive  │ Simulated       │
-│ Pacman Orphan Removal   │ Deletes packages  │ BLOCKED (Report) │ Simulated       │
-│ Pacman Cache Prune      │ Deletes old pkgs  │ BLOCKED          │ Simulated       │
-│ rm -rf Operations       │ Active            │ BLOCKED          │ Simulated       │
-│ Steam Shader Removal    │ Deletes orphans   │ BLOCKED (Report) │ Simulated       │
-│ Steam Compatdata Purge  │ BLOCKED (Report)  │ BLOCKED (Report) │ BLOCKED (Report)│
-└─────────────────────────┴───────────────────┴──────────────────┴─────────────────┘
-```
+| Feature | Standard Mode | Safe Mode (`-s`) | Dry-Run (`-d`) |
+| :--- | :--- | :--- | :--- |
+| **Timeshift Snapshot** | Creates snapshot | Creates snapshot | Simulated |
+| **Btrfs Scrub** | Executes | Executes | Simulated |
+| **SSD fstrim** | Executes | Executes | Simulated |
+| **Journal Vacuum** | Executes | Executes | Simulated |
+| **Config Backup (`.tar.zst`)** | Creates archive | Creates archive | Simulated |
+| **Pacman Orphan Removal** | Deletes packages | **BLOCKED** (Report only) | Simulated |
+| **Pacman Cache Prune** | Deletes old packages | **BLOCKED** | Simulated |
+| **`rm -rf` Deletions** | Active | **BLOCKED** | Simulated |
+| **Steam Shader Removal** | Deletes orphans | **BLOCKED** (Report only) | Simulated |
+| **Steam Compatdata Purge** | **BLOCKED** (Report only) | **BLOCKED** (Report only) | **BLOCKED** (Report only) |
 
 > [!TIP]
 > **Safe Mode** is for "real maintenance, zero deletions" runs. If you're ever unsure, use this.
@@ -118,13 +168,13 @@ sudo ln -sf /usr/local/bin/cachyos-housekeeping /usr/local/bin/cachy-clean
 
 When launched without `--all` or `--modules`, an interactive checklist prompts you to choose which modules to run:
 
-- `[ ] Pacman cleanup` (orphaned dependencies and package cache trimming)
-- `[ ] AUR helper cleanup` (paru and yay build cache wipe)
-- `[ ] Flatpak cleanup` (unused runtimes and application dependencies)
-- `[ ] KDE Plasma & caches` (Baloo indexer, Kdenlive proxies, thumbnails, broken symlinks)
-- `[ ] Steam orphan sweeper` (abandoned shader caches across multi-drive libraries)
-- `[ ] Btrfs scrub & SSD TRIM` (filesystem verification and TRIM dispatch)
-- `[ ] Configuration backup` (lightweight desktop config archive for Proton Drive)
+- [ ] **Pacman cleanup**: Orphaned dependencies and package cache trimming
+- [ ] **AUR helper cleanup**: `paru` and `yay` build cache wipe
+- [ ] **Flatpak cleanup**: Unused runtimes and application dependencies
+- [ ] **KDE Plasma & caches**: Baloo indexer, Kdenlive proxies, thumbnails, broken symlinks
+- [ ] **Steam orphan sweeper**: Abandoned shader caches across multi-drive libraries
+- [ ] **Btrfs scrub & SSD TRIM**: Filesystem verification and TRIM dispatch
+- [ ] **Configuration backup**: Lightweight desktop config archive for Proton Drive
 
 ---
 
@@ -138,31 +188,42 @@ When launched without `--all` or `--modules`, an interactive checklist prompts y
 ## Advanced System Monitors
 
 ### A. Journal Growth Monitor
-Before vacuuming journal archives, the suite queries:
+
+Before vacuuming journal archives, the suite queries storage consumption:
+
 ```bash
 journalctl --disk-usage
 ```
+
 The exact byte count is recorded in `/var/log/cachyos-housekeeping.log` to track long-term journal growth.
 
 ### B. KDE Baloo Index Fragmentation Check
+
 Baloo's LMDB index storage engine fragments heavily over time, splitting into multiple `index-*` chunks. The suite checks:
+
 ```bash
 frag_count=$(find "$baloo_dir" -maxdepth 1 -type f -name "index-*" | wc -l)
 ```
+
 If `frag_count > 20`, severe fragmentation is logged, prompting an index rebuild.
 
 ### C. Steam Shadercache Performance Monitor
-Queries and records total disk allocation for shader caches on all discovered Steam library partitions before any sweeping takes place.
+
+Queries and records total disk allocation for shader caches on all discovered Steam library partitions before any sweeping takes place:
+
+```bash
+du -sh "$lib/steamapps/shadercache"
+```
 
 ---
 
 ## Prerequisites & Package Requirements
 
-The following packages are installed automatically when using the AUR package:
+The following packages are installed automatically when using the package:
 
 | Category | Package | Purpose |
 | :--- | :--- | :--- |
-| **Mandatory** | `bash` | Shell interpreter ($\ge$ 5.0) |
+| **Mandatory** | `bash` | Shell interpreter (>= 5.0) |
 | **Mandatory** | `pacman-contrib` | Provides `paccache` for package cache pruning |
 | **Mandatory** | `coreutils`, `findutils`, `grep`, `sed`, `gawk`, `tar`, `zstd` | Standard POSIX & compression tooling |
 | **Recommended**| `gum` | Modern Charmbracelet CLI for the interactive module checklist |
@@ -176,6 +237,8 @@ The following packages are installed automatically when using the AUR package:
 ---
 
 ## CLI Options & Usage Guide
+
+### CLI Syntax
 
 ```text
 Usage: sudo cachyos-housekeeping [OPTIONS]
@@ -201,7 +264,8 @@ Information:
   -h, --help                Display this help message and exit.
 ```
 
-### Examples
+### Command Examples
+
 ```bash
 # Standard interactive execution
 sudo cachyos-housekeeping
@@ -232,12 +296,12 @@ Always runs prior to cleanup modules to ensure rollback protection. If snapshot 
 ### Step 2: Arch Package Cleanup
 - **Pacman**: `pacman -Qtdq` orphan detection and `paccache -rk2` trimming.
 - **AUR**: Prunes `paru` and `yay` caches.
-- **Flatpak**: Uninstalls unused runtimes (`flatpak uninstall --unused -y`).
+- **Flatpak**: Uninstalls unused runtimes via `flatpak uninstall --unused -y`.
 
 ### Step 3: Advanced Deep Maintenance (Btrfs, Baloo, Journal)
 - **Journal**: Records `journalctl --disk-usage` before vacuuming to 2 weeks.
 - **Coredumps**: Empties `/var/lib/systemd/coredump` safely via `safe_empty_directory`.
-- **Baloo**: Evaluates fragmentation and index size; conditionally runs `suspend` $\rightarrow$ `purge` $\rightarrow$ `check` only if corrupt or bloated (>500MB).
+- **Baloo**: Evaluates fragmentation and index size; conditionally runs `suspend` → `purge` → `check` only if corrupt or bloated (>500MB).
 - **Caches**: Wipes Kdenlive proxies and thumbnail cache.
 - **Btrfs Scrub & SSD TRIM**: Runs foreground `btrfs scrub start -Bd /` and `fstrim -av`.
 - **Pacnew Scan**: Searches `/etc` for `.pacnew` / `.pacsave` configuration files.
@@ -261,8 +325,15 @@ Always runs prior to cleanup modules to ensure rollback protection. If snapshot 
 ## Log Files & Telemetry
 
 Full execution logs, journal trends, and shader metrics are appended to:
-```bash
+
+```text
 /var/log/cachyos-housekeeping.log
+```
+
+To follow active housekeeping logs in real time:
+
+```bash
+tail -f /var/log/cachyos-housekeeping.log
 ```
 
 For long‑term operational longevity, consider adding this log to your system's `logrotate` configuration (e.g. `/etc/logrotate.d/cachyos-housekeeping`).
@@ -271,7 +342,7 @@ For long‑term operational longevity, consider adding this log to your system's
 
 ## Aliases & Shortcuts
 
-If using the AUR package, `cachy-clean` is already installed as a system symlink. If running the standalone script, you can add these aliases to your `~/.bashrc` or `~/.zshrc`:
+If using the installed package, `cachy-clean` is already available as a system symlink. If running the standalone script, you can add these aliases to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 alias cachy-clean="sudo cachyos-housekeeping"
@@ -283,14 +354,36 @@ alias cachy-dry="sudo cachyos-housekeeping --dry-run"
 
 ## Changelog & Documentation
 
-* Complete release history and version notes: [CHANGELOG.md](CHANGELOG.md)
-* AUR packaging and maintainer publication guide: [AUR_PUBLISHING.md](AUR_PUBLISHING.md)
+For detailed release history and version-by-version changes, see the [Changelog](CHANGELOG.md).
+
+Maintainers and contributors can find package publication procedures in the [AUR Publishing Guide](AUR_PUBLISHING.md).
 
 ---
 
 ## AUR Publication & Maintenance
 
 Maintainers can publish or update this package on the Arch User Repository using the instructions in [AUR_PUBLISHING.md](AUR_PUBLISHING.md). The repository includes an audited [PKGBUILD](PKGBUILD), [.SRCINFO](.SRCINFO), and automated GitHub Actions CI & release packaging workflows.
+
+---
+
+## AI Assistance Disclosure
+
+This project was developed with significant AI assistance during design, implementation, refactoring, documentation, packaging, and review.
+
+AI tools were used to help generate code, propose architectural changes, identify bugs, review implementations, create documentation, and produce packaging and CI/CD assets. However, all generated code and recommendations were manually reviewed, tested, modified, and integrated by the project maintainer.
+
+The maintainer remains solely responsible for:
+
+- Project direction and feature decisions
+- Code review and acceptance
+- Testing and validation
+- Bug fixes and maintenance
+- Security and safety decisions
+- Releases and package publication
+
+AI-generated code should not be assumed correct by default. Features and changes included in this repository are expected to undergo the same review, testing, and validation process as any other contribution.
+
+If you find a bug, unsafe behavior, packaging issue, or logic error, please open an issue on GitHub. Feedback and code review are always welcome.
 
 ---
 
