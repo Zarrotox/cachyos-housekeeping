@@ -1,0 +1,67 @@
+name: CI - Code Quality & Package Validation
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: ShellCheck Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: 'warning'
+        env:
+          SHELLCHECK_OPTS: -e SC2086
+
+  bash-syntax:
+    name: Bash Syntax Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Syntax (bash -n)
+        run: |
+          bash -n cachyos-housekeeping.sh
+          echo "Syntax verification passed."
+
+      - name: Test Help & Version Flags
+        run: |
+          bash cachyos-housekeeping.sh --help
+          bash cachyos-housekeeping.sh --version
+
+  pkgbuild-check:
+    name: Arch Linux PKGBUILD & .SRCINFO Validation
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Linting & Packaging Tools
+        run: |
+          pacman -Syu --noconfirm --needed pacman-contrib namcap git
+
+      - name: Verify .SRCINFO Synchronization
+        run: |
+          makepkg --printsrcinfo > .SRCINFO.generated
+          if ! diff -u .SRCINFO .SRCINFO.generated; then
+            echo "ERROR: .SRCINFO is out of sync with PKGBUILD. Run 'makepkg --printsrcinfo > .SRCINFO'."
+            exit 1
+          fi
+          echo ".SRCINFO is synchronized."
+
+      - name: Lint PKGBUILD with Namcap
+        run: |
+          namcap PKGBUILD

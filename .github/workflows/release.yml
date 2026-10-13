@@ -1,0 +1,75 @@
+name: Release - GitHub & AUR Assets
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build & Publish Release Assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract Release Tag & Version
+        id: vars
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Preparing release for version: ${VERSION}"
+
+      - name: Install Archive Tools
+        run: sudo apt-get update && sudo apt-get install -y zstd tar
+
+      - name: Create Release Tarballs
+        run: |
+          VERSION="${{ steps.vars.outputs.version }}"
+          DIST_DIR="cachyos-housekeeping-${VERSION}"
+          mkdir -p "${DIST_DIR}"
+
+          cp cachyos-housekeeping.sh "${DIST_DIR}/"
+          cp LICENSE "${DIST_DIR}/"
+          cp README.md "${DIST_DIR}/"
+          cp CHANGELOG.md "${DIST_DIR}/"
+          cp PKGBUILD "${DIST_DIR}/"
+          cp .SRCINFO "${DIST_DIR}/"
+
+          tar -czf "cachyos-housekeeping-v${VERSION}.tar.gz" "${DIST_DIR}"
+          tar --zstd -cf "cachyos-housekeeping-v${VERSION}.tar.zst" "${DIST_DIR}"
+
+          sha256sum "cachyos-housekeeping-v${VERSION}.tar.gz" > SHA256SUMS
+          sha256sum "cachyos-housekeeping-v${VERSION}.tar.zst" >> SHA256SUMS
+
+          cat SHA256SUMS
+
+      - name: Extract Release Notes from CHANGELOG.md
+        id: changelog
+        run: |
+          VERSION="${{ steps.vars.outputs.version }}"
+          sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | sed '$d' > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Release ${VERSION} of CachyOS Housekeeping Suite." > RELEASE_NOTES.md
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "CachyOS Housekeeping Suite v${{ steps.vars.outputs.version }}"
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            cachyos-housekeeping-v${{ steps.vars.outputs.version }}.tar.gz
+            cachyos-housekeeping-v${{ steps.vars.outputs.version }}.tar.zst
+            SHA256SUMS
+            PKGBUILD
+            .SRCINFO

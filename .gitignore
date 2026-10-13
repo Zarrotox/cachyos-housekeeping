@@ -2,11 +2,18 @@
 *.log
 /var/log/
 
-# Backup archives
+# Backup and release archives
 *.tar.zst
 *.tar.gz
 *.tar.xz
 *.tar
+
+# Arch Linux / makepkg build artifacts
+src/
+pkg/
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.pkg.tar
 
 # System and editor artifacts
 .DS_Store
