@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2026.10.16] - 2026-10-13
+
+### Added
+- **Dual Snapshot Engine (Snapper & Timeshift)**: Implemented native dual snapshot backend support in `cachyos-housekeeping.sh`. Step 0/5 (`run_preflight_checks()`) automatically probes for `snapper` first (standard CachyOS Btrfs setup), then falls back to `timeshift`. Step 1/5 (`run_system_safety()`) creates a `"Pre-Housekeeping"` snapshot via `snapper -c root create` (with fallback to default config `snapper create`) or `timeshift --create`. If neither snapshot tool is available, preflight exits with actionable installation remedies.
+- **Packaging Dependencies**: Added `snapper` to `optdepends` in `PKGBUILD` and `.SRCINFO` for native Btrfs snapshot support prior to maintenance operations.
+
+### Fixed
+- **Container Runtime & Application Lock Symlink Protection**: Protected container rootfs environments and active application locks from broken symlink scanning in Step 3/5 (`run_kde_cleanup()`):
+  - Explicitly prunes runtime, container, and game directories (`~/.local/share/Steam`, `~/.local/share/umu`, `~/.local/share/lutris`, `~/.local/share/Trash`, `~/.local/share/containers`, `~/.local/share/flatpak`, `~/.local/share/docker`), preventing `find` from traversing internal Steam Runtime / `pressure-vessel` container paths (e.g. `umu/steamrt3` and `steamrt4`).
+  - Explicitly excludes `! -name "Singleton*"` and `! -name "lock"`, ensuring active Chromium/Electron (Brave, Chrome, Vesktop, Antigravity) and Gecko (Firefox, LibreWolf) profile lock symlinks are never falsely flagged or removed.
+- **Mounted Media Path Safeguard (`safe_rm_rf` / `safe_empty_directory`)**: Permitted deletions inside secondary drives mounted under `/run/media/*/*/*` (e.g. multi-drive Steam libraries mounted by KDE/udisks2 at `/run/media/<user>/<drive>/...`), while continuing to strictly protect the `/run/media` root, user directories, drive mount roots, and all system `/run/*` paths.
+- **Hardened Configuration Backup (`run_backup_module`)**:
+  - Excluded heavy browser profiles and Electron caches from `.config` backups (`BraveSoftware`, `librewolf`, `mozilla`, `google-chrome`, `chromium`, `vivaldi`, `microsoft-edge`, `opera`, `vesktop`, `discord`, `Antigravity`, `Code`, `*/Cache/*`, `*/Code Cache/*`, `*/GPUCache/*`, `*/Singleton*`, `*/lock`), drastically reducing backup archive size for lightweight Proton Drive syncing.
+  - Added `--warning=no-file-changed` and `--ignore-failed-read` to `tar`, capturing the exit code (`local tar_rc=0; tar ... || tar_rc=$?`) and accepting `(( tar_rc == 0 || tar_rc == 1 ))` as success to prevent live file modification warnings during browser/app execution from failing the backup step.
+
+---
+
 ## [2026.10.15] - 2026-10-13
 
 ### Fixed

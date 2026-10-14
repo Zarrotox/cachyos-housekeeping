@@ -1,6 +1,6 @@
 pkgbase = cachyos-housekeeping
 	pkgdesc = Comprehensive sysadmin-grade housekeeping, optimization, and backup suite for CachyOS / KDE Plasma
-	pkgver = 2026.10.15
+	pkgver = 2026.10.16
 	pkgrel = 1
 	url = https://github.com/Zarrotox/cachyos-housekeeping
 	arch = any
@@ -17,6 +17,7 @@ pkgbase = cachyos-housekeeping
 	depends = zstd
 	optdepends = gum: modern interactive module selection and prompts
 	optdepends = whiptail: standard dialog-based interactive module selection fallback
+	optdepends = snapper: native CachyOS Btrfs system snapshots before maintenance
 	optdepends = timeshift: automated system safety snapshots before maintenance
 	optdepends = flatpak: cleanup of unused Flatpak runtimes
 	optdepends = paru: automated build cache pruning for paru AUR helper
@@ -24,7 +25,7 @@ pkgbase = cachyos-housekeeping
 	optdepends = baloo: KDE Plasma file indexer health check and maintenance
 	optdepends = libnotify: native KDE desktop notifications via notify-send
 	optdepends = btrfs-progs: filesystem scrub and Btrfs maintenance
-	source = cachyos-housekeeping-2026.10.15.tar.gz::https://github.com/Zarrotox/cachyos-housekeeping/archive/refs/tags/v2026.10.15.tar.gz
+	source = cachyos-housekeeping-2026.10.16.tar.gz::https://github.com/Zarrotox/cachyos-housekeeping/archive/refs/tags/v2026.10.16.tar.gz
 	sha256sums = SKIP
 
 pkgname = cachyos-housekeeping

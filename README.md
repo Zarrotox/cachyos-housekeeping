@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: CachyOS / Arch Linux](https://img.shields.io/badge/Platform-CachyOS%20%2F%20Arch%20Linux-00d1b2.svg)](#)
 
-**Version**: `2026.10.15`  
+**Version**: `2026.10.16`  
 **Author**: Zarrotox  
 **Target OS**: CachyOS / Arch Linux with KDE Plasma 6  
 
@@ -37,7 +37,7 @@ Flatpak pruning, Baloo maintenance, backups, and filesystem health checks.
 CachyOS Housekeeping Suite consolidates those maintenance workflows into
 a single safety-focused utility with:
 
-- Timeshift rollback protection
+- Dual snapshot rollback protection (Snapper & Timeshift)
 - Dry-run simulation
 - Safe Mode execution
 - Steam data preservation safeguards
@@ -77,7 +77,7 @@ housekeeping workflow for power users.
   - [Command Examples](#command-examples)
 - [Detailed 5-Step Pipeline](#detailed-5-step-pipeline)
   - [Step 0: Preflight Verification](#step-0-preflight-verification)
-  - [Step 1: System Safety (Timeshift Failsafe)](#step-1-system-safety-timeshift-failsafe)
+  - [Step 1: System Safety (Snapper / Timeshift Snapshot)](#step-1-system-safety-snapper--timeshift-snapshot)
   - [Step 2: Arch Package Cleanup](#step-2-arch-package-cleanup)
   - [Step 3: Advanced Deep Maintenance (Btrfs, Baloo, Journal)](#step-3-advanced-deep-maintenance-btrfs-baloo-journal)
   - [Step 4: Multi-Drive Steam Orphan Sweeper](#step-4-multi-drive-steam-orphan-sweeper)
@@ -144,7 +144,7 @@ Once published, package installation via AUR helpers will be supported:
 
 | Feature | Standard Mode | Safe Mode (`-s`) | Dry-Run (`-d`) |
 | :--- | :--- | :--- | :--- |
-| **Timeshift Snapshot** | Creates snapshot | Creates snapshot | Simulated |
+| **System Snapshot (Snapper/Timeshift)** | Creates snapshot | Creates snapshot | Simulated |
 | **Btrfs Scrub** | Executes | Executes | Simulated |
 | **SSD fstrim** | Executes | Executes | Simulated |
 | **Journal Vacuum** | Executes | Executes | Simulated |
@@ -158,7 +158,7 @@ Once published, package installation via AUR helpers will be supported:
 > [!TIP]
 > **Safe Mode** is for "real maintenance, zero deletions" runs. If you're ever unsure, use this.
 
-1. **Standard Mode**: Full automated maintenance with pre-run Timeshift safety snapshot.
+1. **Standard Mode**: Full automated maintenance with pre-run system safety snapshot (Snapper or Timeshift).
 2. **Safe Mode (`--safe-mode`)**: Executes all health diagnostics, filesystem maintenance, journal vacuuming, and backups, but strictly blocks any `rm -rf` file deletions and package removals.
 3. **Dry-Run Mode (`--dry-run`)**: Simulates all operations, displaying projected reclaimable space without modifying disks.
 
@@ -228,7 +228,7 @@ The following packages are installed automatically when using the package:
 | **Mandatory** | `coreutils`, `findutils`, `grep`, `sed`, `gawk`, `tar`, `zstd` | Standard POSIX & compression tooling |
 | **Recommended**| `gum` | Modern Charmbracelet CLI for the interactive module checklist |
 | **Fallback** | `whiptail` | Standard dialog-based TUI menu when `gum` is absent |
-| **Safety** | `timeshift` | Automated system restore snapshot creation |
+| **Safety** | `snapper` / `timeshift` | Automated system safety snapshot creation (Snapper native on CachyOS Btrfs, Timeshift fallback) |
 | **Desktop** | `libnotify` | Pushes native KDE Plasma desktop completion alerts |
 | **Optional** | `paru` / `yay` | AUR cache cleanup |
 | **Optional** | `flatpak` | Unused Flatpak runtime uninstaller |
@@ -245,7 +245,7 @@ Usage: sudo cachyos-housekeeping [OPTIONS]
 
 Execution Modes:
   -d, --dry-run             Simulate all operations without modifying or deleting files.
-  -s, --safe-mode           Execute non-destructive tasks (Timeshift, btrfs scrub, fstrim,
+  -s, --safe-mode           Execute non-destructive tasks (Snapper/Timeshift, btrfs scrub, fstrim,
                             journal vacuum, backup) while strictly prohibiting all 'rm -rf'
                             and uninstallation deletions.
 
@@ -288,10 +288,10 @@ sudo cachyos-housekeeping -m pacman,steam,btrfs -y
 ## Detailed 5-Step Pipeline
 
 ### Step 0: Preflight Verification
-Verifies presence of core utilities, Timeshift, pacman-contrib, and desktop context before executing any operations.
+Verifies presence of core utilities, snapshot backend (`snapper` or `timeshift`), pacman-contrib, and desktop context before executing any operations.
 
-### Step 1: System Safety (Timeshift Failsafe)
-Always runs prior to cleanup modules to ensure rollback protection. If snapshot creation fails, the script immediately halts execution.
+### Step 1: System Safety (Snapper / Timeshift Snapshot)
+Always runs prior to cleanup modules to ensure rollback protection. Automatically detects and utilizes native `snapper` (default on CachyOS Btrfs) or `timeshift`. If snapshot creation fails, the script immediately halts execution.
 
 ### Step 2: Arch Package Cleanup
 - **Pacman**: `pacman -Qtdq` orphan detection and `paccache -rk2` trimming.
@@ -314,7 +314,7 @@ Always runs prior to cleanup modules to ensure rollback protection. If snapshot 
 - **Safely preserves** `compatdata/` folders (reporting them as candidates to protect user save files).
 
 ### Step 5: Proton Drive Payload & Notifications
-- Archives `~/.config`, shell RCs (`.bashrc`, `.zshrc`), and lightweight KDE folders (`konsole`, `plasma`, `kxmlgui5`, `kxmlgui6`, `kdenlive`, `color-schemes`, `dolphin`, `applications`), avoiding heavy game/Steam directories.
+- Archives `~/.config` (excluding heavy browser and Electron application profiles such as Brave, Chrome, LibreWolf, Firefox, Discord, Vesktop, Code, and volatile caches/locks to keep the Proton Drive archive lightweight), shell RCs (`.bashrc`, `.zshrc`), and lightweight KDE folders (`konsole`, `plasma`, `kxmlgui5`, `kxmlgui6`, `kdenlive`, `color-schemes`, `dolphin`, `plasma-systemmonitor`, `applications`), avoiding heavy game/Steam directories.
 - Writes to temporary archive atomically and moves to `~/Desktop/CachyOS-Config-Backup-YYYY-MM-DD_HH-MM-SS.tar.zst`.
 - Restricts archive permissions to mode `0600` under `$TARGET_USER:$TARGET_GROUP`.
 - Prints the **Disk Reclamation Summary Table** accompanied by the **Session Profile Footer** (`Mode: ...`, `Modules executed: ...`, `Status: ...`) and logs it to `/var/log/cachyos-housekeeping.log`.

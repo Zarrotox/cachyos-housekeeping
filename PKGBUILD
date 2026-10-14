@@ -1,6 +1,6 @@
 # Maintainer: Zarrotox <zarrotox at users.noreply.github.com>
 pkgname=cachyos-housekeeping
-pkgver=2026.10.15
+pkgver=2026.10.16
 pkgrel=1
 pkgdesc="Comprehensive sysadmin-grade housekeeping, optimization, and backup suite for CachyOS / KDE Plasma"
 arch=('any')
@@ -21,6 +21,7 @@ depends=(
 optdepends=(
     'gum: modern interactive module selection and prompts'
     'whiptail: standard dialog-based interactive module selection fallback'
+    'snapper: native CachyOS Btrfs system snapshots before maintenance'
     'timeshift: automated system safety snapshots before maintenance'
     'flatpak: cleanup of unused Flatpak runtimes'
     'paru: automated build cache pruning for paru AUR helper'

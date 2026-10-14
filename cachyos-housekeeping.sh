@@ -2,7 +2,7 @@
 # ==============================================================================
 # CachyOS & KDE Plasma Comprehensive Housekeeping Suite
 # ==============================================================================
-# SCRIPT_VERSION="2026.10.15"
+# SCRIPT_VERSION="2026.10.16"
 # AUTHOR="Zarrotox"
 #
 # Description: Production-grade system maintenance, optimization, and backup
@@ -26,7 +26,7 @@
 set -euo pipefail
 
 # Script Version
-SCRIPT_VERSION="2026.10.15"
+SCRIPT_VERSION="2026.10.16"
 
 # ------------------------------------------------------------------------------
 # Global Telemetry Counters & Variables
@@ -43,6 +43,7 @@ KDE_CACHES_FREED=0
 STEAM_ORPHANS_FREED=0
 
 BALOO_BIN=""
+SNAPSHOT_BACKEND=""
 
 # ------------------------------------------------------------------------------
 # Signal Trapping & Interruption Handling
@@ -71,7 +72,7 @@ Comprehensive maintenance, sanitization, and backup suite for CachyOS / KDE Plas
 
 Execution Modes:
   -d, --dry-run             Simulate all operations without modifying or deleting files.
-  -s, --safe-mode           Execute non-destructive tasks (Timeshift, btrfs scrub, fstrim,
+  -s, --safe-mode           Execute non-destructive tasks (Snapper/Timeshift, btrfs scrub, fstrim,
                             journal vacuum, backup) while strictly prohibiting all 'rm -rf'
                             and uninstallation deletions.
 
@@ -355,6 +356,8 @@ safe_rm_rf() {
 
     # Refuse root and critical system trees
     case "$canon_path" in
+        /run/media/*/*/*)
+            ;;
         /|/root|/home|/home/|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
             print_error "safe_rm_rf: CRITICAL - Refused deletion of protected system path: '$canon_path'."
             return 1
@@ -406,6 +409,8 @@ safe_empty_directory() {
 
     # Refuse root and critical system trees
     case "$canon_dir" in
+        /run/media/*/*/*)
+            ;;
         /|/root|/home|/home/|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
             print_error "safe_empty_directory: CRITICAL - Refused emptying protected system directory: '$canon_dir'."
             return 1
@@ -838,13 +843,17 @@ run_preflight_checks() {
     print_step "0/5" "Preflight Dependency & System Verification"
     local preflight_fatal=false
 
-    # 1. Timeshift check (Critical for system rollback guarantee)
-    if ! command -v timeshift >/dev/null 2>&1; then
-        print_error "Preflight: 'timeshift' is not installed or not in PATH."
-        echo "    Remedy: Install with 'sudo pacman -S timeshift' and initialize via Timeshift GUI." >&2
-        preflight_fatal=true
+    # 1. Snapshot backend check (Snapper or Timeshift for rollback guarantee)
+    if command -v snapper >/dev/null 2>&1; then
+        SNAPSHOT_BACKEND="snapper"
+        print_success "Preflight: Snapshot backend detected: snapper."
+    elif command -v timeshift >/dev/null 2>&1; then
+        SNAPSHOT_BACKEND="timeshift"
+        print_success "Preflight: Snapshot backend detected: timeshift."
     else
-        print_success "Preflight: Timeshift is installed."
+        preflight_fatal=true
+        print_error "Preflight: Neither 'snapper' nor 'timeshift' is installed. A snapshot backend is required for system rollback safety."
+        echo "    Remedy: Install with 'sudo pacman -S snapper' or 'sudo pacman -S timeshift'." >&2
     fi
 
     # 2. pacman-contrib check (paccache)
@@ -933,29 +942,39 @@ run_preflight_checks() {
 run_preflight_checks
 
 # ==============================================================================
-# STEP 1: SYSTEM SAFETY (TIMESHIFT SNAPSHOT)
+# STEP 1: SYSTEM SAFETY (PRE-HOUSEKEEPING SNAPSHOT)
 # ==============================================================================
 run_system_safety() {
-    print_step "1/5" "System Safety (Timeshift Snapshot)"
+    print_step "1/5" "System Safety (Pre-Housekeeping Snapshot)"
 
     if [[ "$DRY_RUN" = true ]]; then
-        print_info "[DRY-RUN] Would create Timeshift snapshot labeled 'Pre-Housekeeping'."
+        print_info "[DRY-RUN] Would create 'Pre-Housekeeping' system snapshot via ${SNAPSHOT_BACKEND}."
         return 0
     fi
 
-    print_progress "Triggering Timeshift snapshot labeled 'Pre-Housekeeping'..."
-    if ! command -v timeshift >/dev/null 2>&1; then
-        print_error "Timeshift executable not found! Cannot guarantee system safety."
-        print_error "Aborting all housekeeping tasks immediately."
-        exit 1
-    fi
-
-    if timeshift --create --comments 'Pre-Housekeeping'; then
-        print_success "Timeshift snapshot 'Pre-Housekeeping' created successfully."
+    if [[ "$SNAPSHOT_BACKEND" == "snapper" ]]; then
+        print_progress "Triggering Snapper snapshot labeled 'Pre-Housekeeping'..."
+        if snapper -c root create --description "Pre-Housekeeping" --cleanup-algorithm number 2>/dev/null || snapper create --description "Pre-Housekeeping"; then
+            print_success "Snapper snapshot 'Pre-Housekeeping' created successfully."
+        else
+            print_error "Snapper snapshot creation FAILED!"
+            print_error "CRITICAL: Halting execution immediately to protect system integrity."
+            print_error "No cleanup or modification tasks have been performed."
+            exit 1
+        fi
+    elif [[ "$SNAPSHOT_BACKEND" == "timeshift" ]]; then
+        print_progress "Triggering Timeshift snapshot labeled 'Pre-Housekeeping'..."
+        if timeshift --create --comments 'Pre-Housekeeping'; then
+            print_success "Timeshift snapshot 'Pre-Housekeeping' created successfully."
+        else
+            print_error "Timeshift snapshot creation FAILED!"
+            print_error "CRITICAL: Halting execution immediately to protect system integrity."
+            print_error "No cleanup or modification tasks have been performed."
+            exit 1
+        fi
     else
-        print_error "Timeshift snapshot creation FAILED!"
+        print_error "No valid snapshot backend configured! Cannot guarantee system safety."
         print_error "CRITICAL: Halting execution immediately to protect system integrity."
-        print_error "No cleanup or modification tasks have been performed."
         exit 1
     fi
 }
@@ -1307,7 +1326,15 @@ run_kde_cleanup() {
     local broken_links=()
     while IFS= read -r -d '' link; do
         broken_links+=("$link")
-    done < <(find "$TARGET_HOME/.config" "$TARGET_HOME/.local" -xtype l -print0 2>/dev/null || true)
+    done < <(find "$TARGET_HOME/.config" "$TARGET_HOME/.local" \
+        \( -path "$TARGET_HOME/.local/share/Steam" \
+           -o -path "$TARGET_HOME/.local/share/umu" \
+           -o -path "$TARGET_HOME/.local/share/lutris" \
+           -o -path "$TARGET_HOME/.local/share/Trash" \
+           -o -path "$TARGET_HOME/.local/share/containers" \
+           -o -path "$TARGET_HOME/.local/share/flatpak" \
+           -o -path "$TARGET_HOME/.local/share/docker" \) -prune \
+        -o -xtype l ! -name "Singleton*" ! -name "lock" -print0 2>/dev/null || true)
 
     if [[ ${#broken_links[@]} -gt 0 ]]; then
         echo -e "${YELLOW}Identified ${#broken_links[@]} broken symlink(s):${RESET}"
@@ -1661,13 +1688,37 @@ run_backup_module() {
         print_info "[DRY-RUN] Would create restricted tar.zst archive at: ${archive_target}"
     else
         # Create archive atomically to temporary file first
-        if tar --zstd \
+        local tar_rc=0
+        tar --zstd \
+            --warning=no-file-changed \
+            --ignore-failed-read \
+            --exclude=".config/BraveSoftware" \
+            --exclude=".config/librewolf" \
+            --exclude=".config/mozilla" \
+            --exclude=".config/google-chrome" \
+            --exclude=".config/chromium" \
+            --exclude=".config/vivaldi" \
+            --exclude=".config/microsoft-edge" \
+            --exclude=".config/opera" \
+            --exclude=".config/vesktop" \
+            --exclude=".config/discord" \
+            --exclude=".config/Antigravity" \
+            --exclude=".config/Code" \
+            --exclude="*/Singleton*" \
+            --exclude="*/lock" \
+            --exclude="*/Cache/*" \
+            --exclude="*/Code Cache/*" \
+            --exclude="*/GPUCache/*" \
+            --exclude="*/Cache" \
+            --exclude="*/Code Cache" \
+            --exclude="*/GPUCache" \
             --exclude="*/cache/*" \
             --exclude="*/proxy/*" \
             -cf "$tmp_archive" \
             -C "$TARGET_HOME" \
-            "${backup_items[@]}"; then
+            "${backup_items[@]}" || tar_rc=$?
 
+        if (( tar_rc == 0 || tar_rc == 1 )); then
             # Move atomically, set correct group ownership and restrict permissions
             mv -f -- "$tmp_archive" "$archive_target"
             chown -- "$TARGET_USER:$TARGET_GROUP" "$archive_target"
