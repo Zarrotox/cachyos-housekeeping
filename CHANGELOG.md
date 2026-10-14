@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Universal-Dev / Phase 2] - 2026-10-14
+
+### Added
+- **Concrete Debian / APT Backend (`experimental/backends/debian.sh`)**:
+  - Implemented non-interactive metadata refresh (`apt-get update -qq`).
+  - Implemented orphan discovery via `apt-get --dry-run autoremove` with candidate reporting, dry-run simulation, and interactive Safe Mode operator confirmation.
+  - Implemented package cache usage measurement and cleanup (`apt-get autoclean` & `apt-get clean`).
+  - Added Canonical Snap disabled revision detection and garbage collection (`snap list --all` & `snap remove`).
+  - Added deep `/etc` scan for `.dpkg-*` and `.ucf-*` merge conflict files.
+- **Concrete Fedora / DNF Backend (`experimental/backends/fedora.sh`)**:
+  - Added dynamic binary resolution preferring `dnf5` with automatic fallback to `dnf`.
+  - Implemented metadata cache refresh via `makecache --refresh`.
+  - Implemented orphan discovery via `repoquery --unneeded -q` and safe autoremove (`autoremove -y`).
+  - Implemented multi-tier cache directory calculation (`/var/cache/libdnf5` vs `/var/cache/dnf`) and cache clearing (`clean all`).
+  - Added `.rpmnew` and `.rpmsave` conflict scanning in `/etc` with `rpmconf -a` integration guidance.
+- **Driver Execution Controls (`experimental/universal-housekeeping.sh`)**:
+  - Added `--apply` / `--execute` flags to toggle from default Dry-Run to live execution.
+  - Added `--yes` / `--no-safe-mode` flags for unattended execution.
+  - Added `--help` / `-h` CLI usage documentation.
+  - Updated startup banner to `Branch: universal-dev | Phase 2`.
+
+---
+
 ## [Universal-Dev / Phase 1] - 2026-10-14
 
 ### Added

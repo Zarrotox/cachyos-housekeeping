@@ -14,8 +14,8 @@ This document outlines the systematic strategy for expanding the production Cach
 | Tier | Distributions | Package Manager | Snapshot Tooling | Status in Framework |
 | :--- | :--- | :--- | :--- | :--- |
 | **Tier 1 (Reference)** | CachyOS, Arch Linux, EndeavourOS | `pacman` + `paccache` (AUR: `paru`, `yay`) | Snapper / Timeshift | **Fully Implemented** (Verified Baseline) |
-| **Tier 2 (Planned)** | Fedora, Nobara | `dnf` / `dnf5` | Snapper / Timeshift | **Framework Stub** (Phase 2 Target) |
-| **Tier 3 (Planned)** | Ubuntu, Linux Mint, Pop!_OS, Debian | `apt` / `apt-get` | Timeshift | **Framework Stub** (Phase 2 Target) |
+| **Tier 2 (Phase 2)** | Fedora, Nobara | `dnf` / `dnf5` | Snapper / Timeshift | **Implemented** (Phase 2) |
+| **Tier 3 (Phase 2)** | Ubuntu, Linux Mint, Pop!_OS, Debian | `apt` / `apt-get` | Timeshift | **Implemented** (Phase 2) |
 | **Tier 4 (Planned)** | openSUSE (Tumbleweed, Leap) | `zypper` | Snapper (Default) | **Framework Stub** (Phase 3 Target) |
 
 ---

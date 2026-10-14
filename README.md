@@ -57,9 +57,10 @@ The **Universal Linux Housekeeping Framework** is an experimental cross-distribu
 - ✅ **Stubs Created**: Initial scaffolding for Fedora, Debian, and openSUSE.
 - ✅ **ZARROTOX Branding**: Stylized ASCII banner and unified identity.
 
-### Phase 2 (Planned)
-- ⬜ **Fedora / Nobara Support**: Full `dnf` / `dnf5` and `rpmconf` implementations.
-- ⬜ **Debian / Ubuntu Support**: Full `apt-get --purge autoremove`, `apt-get clean`, and Snap garbage collection.
+### Phase 2 (In Progress - Active Development)
+- ✅ **Fedora / Nobara Concrete Backend**: Integrated `dnf5` and `dnf` with `makecache --refresh`, `autoremove`, `clean all`, and `.rpmnew`/`.rpmsave` detection.
+- ✅ **Debian / Ubuntu / Mint / Pop Concrete Backend**: Integrated `apt-get` with noninteractive environment, `--purge autoremove`, `autoclean`, `clean`, disabled Snap revision pruning, and `.dpkg-*`/`.ucf-*` conflict scans.
+- ✅ **Driver Execution Control**: Added `--apply` / `--execute` for live changes, `--yes` / `--no-safe-mode` for non-interactive execution, and `--help` / `-h` usage instructions.
 - ⬜ **openSUSE Support**: Full `zypper` backend implementation.
 - ⬜ **Multi-Distro CI**: Container validation across Fedora, Ubuntu, and Arch.
 

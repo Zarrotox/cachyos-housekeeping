@@ -51,9 +51,10 @@ While the `main` branch maintains the hardened, production-proven Arch Linux / C
 - ✅ **Stubs Created**: Initial scaffolding for Fedora, Debian, and openSUSE.
 - ✅ **ZARROTOX Branding**: Stylized ASCII banner and unified identity.
 
-### Phase 2 (Planned)
-- ⬜ **Fedora / Nobara Support**: Full `dnf` / `dnf5` and `rpmconf` implementations.
-- ⬜ **Debian / Ubuntu Support**: Full `apt-get --purge autoremove`, `apt-get clean`, and Snap garbage collection.
+### Phase 2 (In Progress - Active Development)
+- ✅ **Fedora / Nobara Concrete Backend**: Integrated `dnf5` and `dnf` with `makecache --refresh`, `autoremove`, `clean all`, and `.rpmnew`/`.rpmsave` detection.
+- ✅ **Debian / Ubuntu / Mint / Pop Concrete Backend**: Integrated `apt-get` with noninteractive environment, `--purge autoremove`, `autoclean`, `clean`, disabled Snap revision pruning, and `.dpkg-*`/`.ucf-*` conflict scans.
+- ✅ **Driver Execution Control**: Added `--apply` / `--execute` for live changes, `--yes` / `--no-safe-mode` for non-interactive execution, and `--help` / `-h` usage instructions.
 - ⬜ **openSUSE Support**: Full `zypper` backend implementation.
 - ⬜ **Multi-Distro CI**: Container validation across Fedora, Ubuntu, and Arch.
 
@@ -77,9 +78,9 @@ experimental/
 ├── backends/
 │   ├── backend_interface.sh    # Contract interface & dynamic loader
 │   ├── arch.sh                 # Reference Arch / CachyOS backend
-│   ├── fedora.sh               # Fedora / Nobara framework stub
-│   ├── debian.sh               # Debian / Ubuntu framework stub
-│   └── suse.sh                 # openSUSE framework stub
+│   ├── fedora.sh               # Concrete Fedora / Nobara backend (dnf/dnf5)
+│   ├── debian.sh               # Concrete Debian / Ubuntu backend (apt/dpkg)
+│   └── suse.sh                 # openSUSE framework stub (zypper)
 ├── compatibility/
 │   └── MATRIX.md               # Feature matrix across 10+ distros
 ├── docs/
@@ -92,13 +93,22 @@ experimental/
 
 ## Quick Start (Testing the Experimental Framework)
 
-Run the experimental driver with your host's `/etc/os-release` or a mock file:
+Run the experimental driver with your host's `/etc/os-release` or test with CLI execution modes:
 
 ```bash
-# Test against your current host environment
+# 1. Standard dry-run audit on current host
 bash experimental/universal-housekeeping.sh
 
-# Run the automated distribution detection unit test suite
+# 2. View available CLI options and execution flags
+bash experimental/universal-housekeeping.sh --help
+
+# 3. Live run with Safe Mode confirmation prompt
+bash experimental/universal-housekeeping.sh --apply
+
+# 4. Fully unattended live execution
+bash experimental/universal-housekeeping.sh --apply --yes
+
+# 5. Run the automated distribution detection unit test suite
 bash experimental/tests/test_distro_detect.sh
 ```
 

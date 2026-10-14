@@ -45,9 +45,10 @@
 - ✅ **ZARROTOX Unified Branding & CLI Banner**
 - ✅ **Cross-Distro Compatibility Matrix & Migration Strategy**
 
-### Phase 2 (Planned)
-- ⬜ **Fedora / Nobara Support** (`dnf` / `dnf5`, `rpmconf`)
-- ⬜ **Debian / Ubuntu Support** (`apt-get --purge autoremove`, `apt-get clean`, `.dpkg-dist`)
+### Phase 2 (In Progress - Active Development)
+- ✅ **Fedora / Nobara Concrete Backend** (`dnf5` / `dnf`, `makecache --refresh`, `autoremove -y`, `clean all`, `.rpmnew` / `.rpmsave` detection)
+- ✅ **Debian / Ubuntu / Mint / Pop Concrete Backend** (`apt-get`, non-interactive environment, `--purge autoremove -y`, `autoclean`, `clean`, Snap revision garbage collection, `.dpkg-*` / `.ucf-*` scans)
+- ✅ **Driver Execution Control** (`--apply` / `--execute`, `--yes` / `--no-safe-mode`, `--help` / `-h`)
 - ⬜ **openSUSE Support** (`zypper packages --orphaned`, `zypper clean`)
 - ⬜ **Containerized CI Validation Matrix** (`archlinux`, `fedora`, `ubuntu`, `opensuse`)
 

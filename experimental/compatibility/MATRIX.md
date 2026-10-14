@@ -27,15 +27,15 @@ This matrix categorizes the portability of housekeeping features across supporte
 | **Pacman Orphan Package Purge** | | ✅ | | | Relies on `pacman -Qtdq` and cascade removal `pacman -Rns`. Arch-family only. |
 | **AUR Helper Cache Sanitization** | | ✅ | | | Specific to Arch User Repository build helpers (`paru`, `yay`). |
 | **Pacnew / Pacsave Conflict Scanner** | | ✅ | | | Arch-specific package merge conflict utility (`pacdiff`). |
-| **DNF Package Cache Clean** | | | ✅ | | Planned Phase 2 backend hook (`dnf clean all` / `dnf clean packages`). Fedora, Nobara, RHEL only. |
-| **DNF Autoremove (Orphan Purge)** | | | ✅ | | Planned Phase 2 backend hook (`dnf autoremove -y`). Fedora, Nobara only. |
-| **RPM Configuration Diff Scanner** | | | ✅ | | Planned Phase 2 tool (`rpmconf -a` scanning `.rpmnew` / `.rpmsave`). Fedora & openSUSE only. |
-| **APT Package Cache Clean** | | | | ❓ (Debian) | Planned Phase 2 backend hook (`apt-get clean && apt-get autoclean`). Ubuntu, Mint, Pop, Debian. |
-| **APT Autoremove (Orphan Purge)** | | | | ❓ (Debian) | Planned Phase 2 backend hook (`apt-get --purge autoremove -y`). Ubuntu, Mint, Pop, Debian. |
-| **DPKG Conflict Scanner** | | | | ❓ (Debian) | Planned Phase 2 scanner for `.dpkg-dist` and `.dpkg-old`. Debian family only. |
-| **Zypper Package Cache Clean** | | | | ❓ (SUSE) | Planned Phase 2 backend hook (`zypper clean --all`). openSUSE family only. |
-| **Zypper Orphan Package Purge** | | | | ❓ (SUSE) | Planned Phase 2 backend hook (`zypper packages --orphaned`). openSUSE family only. |
-| **Snap Package Old Revision Trim** | | | | ❓ (Ubuntu) | Requires custom shell loop to prune superseded Snap revisions on Ubuntu. |
+| **DNF Package Cache Clean** | | | ✅ | | Implemented in Phase 2 (`dnf clean all` / `dnf clean packages`). Fedora, Nobara, RHEL. |
+| **DNF Autoremove (Orphan Purge)** | | | ✅ | | Implemented in Phase 2 (`dnf repoquery --unneeded`, `dnf autoremove -y`). Fedora, Nobara. |
+| **RPM Configuration Diff Scanner** | | | ✅ | | Implemented in Phase 2 (`find /etc` for `.rpmnew` / `.rpmsave`, `rpmconf -a`). Fedora & openSUSE. |
+| **APT Package Cache Clean** | | | | ✅ (Debian) | Implemented in Phase 2 (`apt-get clean && apt-get autoclean`). Ubuntu, Mint, Pop, Debian. |
+| **APT Autoremove (Orphan Purge)** | | | | ✅ (Debian) | Implemented in Phase 2 (`apt-get --dry-run autoremove`, `apt-get --purge autoremove -y`). Ubuntu, Mint, Pop, Debian. |
+| **DPKG Conflict Scanner** | | | | ✅ (Debian) | Implemented in Phase 2 (scans `/etc` for `.dpkg-*` and `.ucf-*`). Debian family. |
+| **Snap Package Old Revision Trim** | | | | ✅ (Ubuntu) | Implemented in Phase 2 (queries disabled revisions via `snap list --all` and prunes). |
+| **Zypper Package Cache Clean** | | | | ❓ (SUSE) | Planned Phase 2/3 backend hook (`zypper clean --all`). openSUSE family. |
+| **Zypper Orphan Package Purge** | | | | ❓ (SUSE) | Planned Phase 2/3 backend hook (`zypper packages --orphaned`). openSUSE family. |
 | **Immutable / Atomic Systems (OSTree)** | | | | ❓ (Future) | Fedora Silverblue, Bazzite, SteamOS. Requires read-only root handling (`rpm-ostree cleanup`). |
 
 ---
