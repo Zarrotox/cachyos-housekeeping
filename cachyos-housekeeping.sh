@@ -362,7 +362,7 @@ safe_rm_rf() {
         /run/media/*/*/*)
             # Allowed: files and subdirectories located inside mounted secondary storage volumes
             ;;
-        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*|/run/media|/run/media/*|/run/media/*/*)
+        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
             print_error "safe_rm_rf: CRITICAL - Refused deletion of protected system path: '$canon_path'."
             return 1
             ;;
@@ -419,7 +419,7 @@ safe_empty_directory() {
         /run/media/*/*/*)
             # Allowed: subdirectories located inside mounted secondary storage volumes
             ;;
-        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*|/run/media|/run/media/*|/run/media/*/*)
+        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
             print_error "safe_empty_directory: CRITICAL - Refused emptying protected system directory: '$canon_dir'."
             return 1
             ;;
