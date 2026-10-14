@@ -354,18 +354,22 @@ safe_rm_rf() {
         return 1
     fi
 
+    local check_path="${canon_path%/}"
+    [[ -z "$check_path" ]] && check_path="/"
+
     # Refuse root and critical system trees
-    case "$canon_path" in
+    case "$check_path" in
         /run/media/*/*/*)
+            # Allowed: files and subdirectories located inside mounted secondary storage volumes
             ;;
-        /|/root|/home|/home/|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
+        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*|/run/media|/run/media/*|/run/media/*/*)
             print_error "safe_rm_rf: CRITICAL - Refused deletion of protected system path: '$canon_path'."
             return 1
             ;;
     esac
 
     # Refuse home directory root
-    if [[ "$canon_path" == "$TARGET_HOME" || "$canon_path" == "${TARGET_HOME}/" ]]; then
+    if [[ "$check_path" == "${TARGET_HOME%/}" ]]; then
         print_error "safe_rm_rf: CRITICAL - Refused deletion of user home root: '$canon_path'."
         return 1
     fi
@@ -407,18 +411,22 @@ safe_empty_directory() {
         return 1
     fi
 
+    local check_path="${canon_dir%/}"
+    [[ -z "$check_path" ]] && check_path="/"
+
     # Refuse root and critical system trees
-    case "$canon_dir" in
+    case "$check_path" in
         /run/media/*/*/*)
+            # Allowed: subdirectories located inside mounted secondary storage volumes
             ;;
-        /|/root|/home|/home/|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*)
+        /|/root|/home|/etc|/etc/*|/usr|/usr/*|/var|/var/log|/var/log/*|/boot|/boot/*|/sys|/sys/*|/proc|/proc/*|/dev|/dev/*|/run|/run/*|/run/media|/run/media/*|/run/media/*/*)
             print_error "safe_empty_directory: CRITICAL - Refused emptying protected system directory: '$canon_dir'."
             return 1
             ;;
     esac
 
     # Refuse user home root
-    if [[ "$canon_dir" == "$TARGET_HOME" || "$canon_dir" == "${TARGET_HOME}/" ]]; then
+    if [[ "$check_path" == "${TARGET_HOME%/}" ]]; then
         print_error "safe_empty_directory: CRITICAL - Refused emptying user home root: '$canon_dir'."
         return 1
     fi
@@ -700,27 +708,54 @@ track_directory_cleanup() {
 
     size_before=$(get_dir_size_bytes "$dir_path")
 
-    if [[ "$DRY_RUN" = true ]]; then
-        echo -e "    ${CYAN}[DRY-RUN]${RESET} Would execute cleanup on: ${dir_path}" >&2
-        printf '%u\n' "$size_before"
-        return 0
-    elif [[ "$SAFE_MODE" = true ]]; then
-        echo -e "    ${YELLOW}[SAFE-MODE]${RESET} Deletion skipped for: ${dir_path}" >&2
-        printf '%u\n' 0
-        return 0
-    fi
+    local callback_cmd="${1:-}"
+    case "$callback_cmd" in
+        delete_steam_dir|safe_rm_rf|safe_empty_directory|purge_coredumps|clean_kdenlive_*|clean_thumbnail_*)
+            # Safe removal functions with internal DRY_RUN and SAFE_MODE handlers.
+            # Execute them so path safety validation runs even during dry-run audits.
+            local callback_rc=0
+            if [[ $# -gt 0 ]]; then
+                "$@" >&2 || callback_rc=$?
+            fi
 
-    # Execute callback safely without eval; route stdout to stderr and capture return status
-    local callback_rc=0
-    if [[ $# -gt 0 ]]; then
-        "$@" >&2 || callback_rc=$?
-    fi
+            if (( callback_rc != 0 )); then
+                print_error "track_directory_cleanup: callback command failed for '${dir_path}' (exit code: ${callback_rc})."
+                printf '%u\n' 0
+                return "$callback_rc"
+            fi
 
-    if (( callback_rc != 0 )); then
-        print_error "track_directory_cleanup: callback command failed for '${dir_path}' (exit code: ${callback_rc})."
-        printf '%u\n' 0
-        return "$callback_rc"
-    fi
+            if [[ "$DRY_RUN" = true ]]; then
+                printf '%u\n' "$size_before"
+                return 0
+            elif [[ "$SAFE_MODE" = true ]]; then
+                printf '%u\n' 0
+                return 0
+            fi
+            ;;
+        *)
+            if [[ "$DRY_RUN" = true ]]; then
+                echo -e "    ${CYAN}[DRY-RUN]${RESET} Would execute cleanup on: ${dir_path}" >&2
+                printf '%u\n' "$size_before"
+                return 0
+            elif [[ "$SAFE_MODE" = true ]]; then
+                echo -e "    ${YELLOW}[SAFE-MODE]${RESET} Deletion skipped for: ${dir_path}" >&2
+                printf '%u\n' 0
+                return 0
+            fi
+
+            # Execute callback safely without eval; route stdout to stderr and capture return status
+            local callback_rc=0
+            if [[ $# -gt 0 ]]; then
+                "$@" >&2 || callback_rc=$?
+            fi
+
+            if (( callback_rc != 0 )); then
+                print_error "track_directory_cleanup: callback command failed for '${dir_path}' (exit code: ${callback_rc})."
+                printf '%u\n' 0
+                return "$callback_rc"
+            fi
+            ;;
+    esac
 
     size_after=$(get_dir_size_bytes "$dir_path")
 
