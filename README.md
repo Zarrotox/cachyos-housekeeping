@@ -1,52 +1,89 @@
-# CachyOS & KDE Plasma Comprehensive Housekeeping Suite
+# Universal Linux Housekeeping Framework
+
+```text
+███████╗ █████╗ ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ██╗  ██╗
+╚══███╔╝██╔══██╗██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚██╗██╔╝
+  ███╔╝ ███████║██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║ ╚███╔╝ 
+ ███╔╝  ██╔══██║██╔══██╗██╔══██╗██║   ██║   ██║   ██║   ██║ ██╔██╗ 
+███████╗██║  ██║██║  ██║██║  ██║╚██████╔╝   ██║   ╚██████╔╝██╔╝ ██╗
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+
+                 UNIVERSAL LINUX HOUSEKEEPING
+               Linux Housekeeping Framework (Experimental)
+                       Author: Zarrotox
+                   Branch: universal-dev | Phase 1
+```
 
 [![CI](https://github.com/Zarrotox/cachyos-housekeeping/actions/workflows/ci.yml/badge.svg)](https://github.com/Zarrotox/cachyos-housekeeping/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Zarrotox/cachyos-housekeeping)](https://github.com/Zarrotox/cachyos-housekeeping/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform: CachyOS / Arch Linux](https://img.shields.io/badge/Platform-CachyOS%20%2F%20Arch%20Linux-00d1b2.svg)](#)
+[![Platform: Linux](https://img.shields.io/badge/Platform-Arch%20%7C%20Fedora%20%7C%20Debian%20%7C%20openSUSE-00d1b2.svg)](#)
 
-**Version**: `2026.10.16`  
 **Author**: Zarrotox  
-**Target OS**: CachyOS / Arch Linux with KDE Plasma 6  
+**Branch**: `universal-dev` (Experimental Framework)  
+**Reference Baseline**: CachyOS / Arch Linux Production Suite (`main` branch)  
 
 ---
 
-**TL;DR:**
+## Branch Status
 
-```bash
-# Standard interactive cleanup
-sudo cachyos-housekeeping
+### Main Branch
+- ✅ **Stable**
+- ✅ **Arch / CachyOS Reference Baseline**
 
-# Non-destructive safe mode (zero deletions)
-sudo cachyos-housekeeping --safe-mode
+### Universal-Dev Branch
+- ⚠️ **Experimental**
+- ⚠️ **Framework Development**
+- ⚠️ **Not Yet Feature Complete**
 
-# Dry-run simulation (preview reclaimable storage)
-sudo cachyos-housekeeping --dry-run
-```
+---
 
-A hardened, sysadmin-grade Bash maintenance, performance-tuning, and backup automation suite designed for manual execution via `sudo` or automated packaging through the Arch User Repository (AUR).
+## Overview
+
+The **Universal Linux Housekeeping Framework** is an experimental cross-distribution maintenance framework engineered to consolidate system sanitization, telemetry, performance optimization, and backup generation across major Linux distributions.
+
+- **Main Branch (`main`)**: The production-hardened, stable CachyOS and Arch Linux reference implementation (`cachyos-housekeeping.sh`).
+- **Universal Branch (`universal-dev`)**: The forward-looking cross-distribution framework introducing modular abstraction layers for Fedora/Nobara, Debian/Ubuntu, and openSUSE.
+
+---
+
+## Development Roadmap
+
+### Phase 1 (Completed)
+- ✅ **Distro Detection Engine**: Parses `/etc/os-release` across 10+ distributions.
+- ✅ **Package Manager Detection**: Identifies `pacman`, `dnf`, `apt`, `zypper`, `flatpak`, and `snap`.
+- ✅ **Backend Interfaces**: Standardized dispatchers for orphan removal, cache trimming, and metadata updates.
+- ✅ **Arch Baseline**: Reference implementation preserved.
+- ✅ **Stubs Created**: Initial scaffolding for Fedora, Debian, and openSUSE.
+- ✅ **ZARROTOX Branding**: Stylized ASCII banner and unified identity.
+
+### Phase 2 (Planned)
+- ⬜ **Fedora / Nobara Support**: Full `dnf` / `dnf5` and `rpmconf` implementations.
+- ⬜ **Debian / Ubuntu Support**: Full `apt-get --purge autoremove`, `apt-get clean`, and Snap garbage collection.
+- ⬜ **openSUSE Support**: Full `zypper` backend implementation.
+- ⬜ **Multi-Distro CI**: Container validation across Fedora, Ubuntu, and Arch.
+
+### Phase 3 (Planned)
+- ⬜ **Immutable Distribution Support**: Detection of atomic systems (`/run/ostree-booted`).
+- ⬜ **Fedora Silverblue & Kinoite**
+- ⬜ **Bazzite & SteamOS Handheld Support**
+- ⬜ **OSTree Read-Only Root Protections**: `rpm-ostree cleanup` integration.
 
 ---
 
 ## Why This Exists
 
-CachyOS and KDE Plasma users often rely on multiple disconnected tools
-for package cleanup, AUR cache maintenance, Steam cache cleanup,
-Flatpak pruning, Baloo maintenance, backups, and filesystem health checks.
+Power users and Linux gamers often juggle multiple disconnected tools for package cache trimming, orphan package sweeps, Steam shadercache cleaning, Flatpak runtime pruning, desktop indexer maintenance, filesystem scrubs, and profile backups.
 
-CachyOS Housekeeping Suite consolidates those maintenance workflows into
-a single safety-focused utility with:
+Universal Linux Housekeeping unifies these workflows into a single safety-focused framework:
 
 - Dual snapshot rollback protection (Snapper & Timeshift)
-- Dry-run simulation
-- Safe Mode execution
-- Steam data preservation safeguards
-- Telemetry and disk reclamation reporting
-- Automated backup generation
-- Btrfs and SSD maintenance
-
-The goal is to provide a repeatable, transparent, and auditable
-housekeeping workflow for power users.
+- Dry-run simulation & Safe Mode execution
+- Multi-drive Steam shadercache orphan cleaning & compatdata protection
+- FreeDesktop & desktop environment cache sanitization
+- Telemetry reporting of freed bytes
+- Btrfs maintenance and SSD TRIM
+- Atomic profile configuration backups (`tar --zstd`)
 
 ---
 

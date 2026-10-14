@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Universal Linux Housekeeping - Experimental Driver Harness
-# Part of Experimental Phase 1: Distro Abstraction Framework
+# Universal Linux Housekeeping Framework - Driver Harness
+# Author: Zarrotox
+# Branch: universal-dev (Experimental)
 # ==============================================================================
-# Demonstrates the integration of distribution detection, package manager
-# discovery, and modular backend dispatching.
+# Demonstrates cross-distribution detection, package manager discovery, and
+# modular backend dispatching under the unified ZARROTOX branding.
 # ==============================================================================
 
 set -euo pipefail
@@ -19,12 +20,35 @@ source "${SCRIPT_DIR}/distro/package_manager.sh"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/backends/backend_interface.sh"
 
-echo "=================================================================="
-echo " Universal Linux Housekeeping Suite (Experimental Architecture)  "
-echo "=================================================================="
+# Render stylized ZARROTOX startup banner
+print_banner() {
+    local bold="\033[1m"
+    local cyan="\033[0;36m"
+    local yellow="\033[1;33m"
+    local blue="\033[0;34m"
+    local gray="\033[0;90m"
+    local reset="\033[0m"
+
+    echo -e "${cyan}${bold}"
+    cat << 'EOF'
+███████╗ █████╗ ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ██╗  ██╗
+╚══███╔╝██╔══██╗██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚██╗██╔╝
+  ███╔╝ ███████║██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║ ╚███╔╝ 
+ ███╔╝  ██╔══██║██╔══██╗██╔══██╗██║   ██║   ██║   ██║   ██║ ██╔██╗ 
+███████╗██║  ██║██║  ██║██║  ██║╚██████╔╝   ██║   ╚██████╔╝██╔╝ ██╗
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+EOF
+    echo -e "${reset}"
+    echo -e "                 ${bold}${yellow}UNIVERSAL LINUX HOUSEKEEPING${reset}"
+    echo -e "               ${blue}Linux Housekeeping Framework (Experimental)${reset}"
+    echo -e "                       ${bold}Author: ${reset}Zarrotox"
+    echo -e "                   ${gray}Branch: universal-dev | Phase 1${reset}\n"
+}
+
+print_banner
 
 # 1. Distribution Detection
-echo -e "\n[1/3] Detecting Host Operating System..."
+echo -e "[1/3] Detecting Host Operating System..."
 detect_distribution "${1:-/etc/os-release}"
 print_distro_info
 

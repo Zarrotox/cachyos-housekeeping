@@ -1,9 +1,21 @@
 # Changelog
 
-All notable changes to the **CachyOS Housekeeping Suite** will be documented in this file.
+All notable changes to the **Universal Linux Housekeeping Framework** (and stable CachyOS Housekeeping Suite) will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
+
+---
+
+## [Universal-Dev / Phase 1] - 2026-10-14
+
+### Added
+- **ZARROTOX Project Rebranding**: Rebranded experimental cross-distribution initiative to **Universal Linux Housekeeping Framework** under author **Zarrotox**. Introduced stylized Unicode/ASCII startup banner with subheaders for distribution detection and active backend reporting.
+- **Distribution Abstraction Engine (`experimental/distro/detect.sh`)**: Built native `/etc/os-release` parser classifying 10+ distributions across Arch, Fedora, Debian, and openSUSE families. Verified with an 11-test automated suite.
+- **Package Manager Detection (`experimental/distro/package_manager.sh`)**: Added dynamic discovery for `pacman`, `dnf`, `apt`, `zypper`, `flatpak`, and `snap`.
+- **Modular Backend Dispatcher (`experimental/backends/backend_interface.sh`)**: Standardized contract exposing `package_remove_orphans()`, `package_clean_cache()`, `package_update_metadata()`, and `package_scan_config_diffs()`.
+- **Arch Reference Baseline (`experimental/backends/arch.sh`)**: Preserved production-hardened Arch/CachyOS functionality as reference baseline.
+- **Cross-Distro Compatibility Matrix & Migration Roadmap (`experimental/compatibility/MATRIX.md`, `experimental/docs/MIGRATION_STRATEGY.md`)**: Comprehensive documentation detailing portable vs. distro-bound maintenance routines.
 
 ---
 

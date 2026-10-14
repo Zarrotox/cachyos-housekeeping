@@ -1,8 +1,61 @@
 # Universal Linux Housekeeping - Architecture & Development Roadmap
 
-**Branch:** `universal-dev`  
-**Status:** Phase 1 (Distro Abstraction & Backend Framework Architecture)  
-**Reference Baseline:** CachyOS / Arch Linux Production Suite (`cachyos-housekeeping.sh`)
+```text
+███████╗ █████╗ ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ██╗  ██╗
+╚══███╔╝██╔══██╗██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔═══██╗╚██╗██╔╝
+  ███╔╝ ███████║██████╔╝██████╔╝██║   ██║   ██║   ██║   ██║ ╚███╔╝ 
+ ███╔╝  ██╔══██║██╔══██╗██╔══██╗██║   ██║   ██║   ██║   ██║ ██╔██╗ 
+███████╗██║  ██║██║  ██║██║  ██║╚██████╔╝   ██║   ╚██████╔╝██╔╝ ██╗
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+
+                 UNIVERSAL LINUX HOUSEKEEPING
+               Linux Housekeeping Framework (Experimental)
+                       Author: Zarrotox
+                   Branch: universal-dev | Phase 1
+```
+
+**Project:** Universal Linux Housekeeping (Linux Housekeeping Framework)  
+**Author:** Zarrotox  
+**Branch:** `universal-dev` (Experimental Framework)  
+**Reference Baseline:** CachyOS / Arch Linux Production Suite (`cachyos-housekeeping.sh` on `main`)
+
+---
+
+## Branch Status
+
+### Main Branch
+- ✅ **Stable**
+- ✅ **Arch / CachyOS Reference Baseline**
+
+### Universal-Dev Branch
+- ⚠️ **Experimental**
+- ⚠️ **Framework Development**
+- ⚠️ **Not Yet Feature Complete**
+
+---
+
+## Development Roadmap & Milestones
+
+### Phase 1 (Completed)
+- ✅ **Distro Detection Engine** (`/etc/os-release` parsing for 10+ distributions)
+- ✅ **Package Manager Detection** (`pacman`, `dnf`, `apt`, `zypper`, `flatpak`, `snap`)
+- ✅ **Backend Dispatcher Interfaces** (`package_remove_orphans`, `package_clean_cache`, `package_update_metadata`)
+- ✅ **Arch Reference Baseline** (`experimental/backends/arch.sh`)
+- ✅ **Framework Stubs for Target Distros** (Fedora, Debian, openSUSE)
+- ✅ **ZARROTOX Unified Branding & CLI Banner**
+- ✅ **Cross-Distro Compatibility Matrix & Migration Strategy**
+
+### Phase 2 (Planned)
+- ⬜ **Fedora / Nobara Support** (`dnf` / `dnf5`, `rpmconf`)
+- ⬜ **Debian / Ubuntu Support** (`apt-get --purge autoremove`, `apt-get clean`, `.dpkg-dist`)
+- ⬜ **openSUSE Support** (`zypper packages --orphaned`, `zypper clean`)
+- ⬜ **Containerized CI Validation Matrix** (`archlinux`, `fedora`, `ubuntu`, `opensuse`)
+
+### Phase 3 (Planned)
+- ⬜ **Immutable Distribution Support** (`/run/ostree-booted` detection)
+- ⬜ **Fedora Silverblue & Kinoite**
+- ⬜ **Bazzite & SteamOS Handheld Support**
+- ⬜ **OSTree Read-Only System Protections** (`rpm-ostree cleanup`)
 
 ---
 
@@ -86,34 +139,10 @@ Phase 2 requires automated container integration testing across reference contai
 - `opensuse/tumbleweed:latest`
 
 ### Verification Checklist per Backend
-- [ ] Correctly identifies distro ID, family, and version in `detect_distribution()`.
-- [ ] Accurately detects primary and secondary package managers.
-- [ ] Safe simulation under `DRY_RUN=true`.
-- [ ] Safe bypass of all deletions under `SAFE_MODE=true`.
-- [ ] Accurate calculation of freed bytes without string contamination on stdout.
-- [ ] Validated non-zero exit codes on protected path violations.
-- [ ] ShellCheck clean with zero warnings under standard CI.
-
----
-
-## 6. Implementation Phases
-
-```
-Phase 1: Architecture & Abstraction Framework [COMPLETED]
-├── Distro detection engine (/etc/os-release parser)
-├── Package manager detection (pacman, dnf, apt, zypper)
-├── Backend dispatcher interface
-├── Arch reference implementation
-├── Fedora, Debian, and SUSE framework stubs
-├── Compatibility matrix & migration strategy
-└── Universal documentation
-
-Phase 2: Backend Implementation (Planned)
-├── Fedora / Nobara implementation (dnf / dnf5, rpmconf)
-├── Debian / Ubuntu / Mint / Pop implementation (apt, dpkg-dist, snap)
-└── Containerized multi-distro CI integration
-
-Phase 3: SUSE & Immutable Platforms (Planned)
-├── openSUSE backend implementation (zypper, snapper)
-└── OSTree detection & read-only root safeguards (Silverblue, Bazzite)
-```
+- [x] Correctly identifies distro ID, family, and version in `detect_distribution()`.
+- [x] Accurately detects primary and secondary package managers.
+- [x] Safe simulation under `DRY_RUN=true`.
+- [x] Safe bypass of all deletions under `SAFE_MODE=true`.
+- [x] Accurate calculation of freed bytes without string contamination on stdout.
+- [x] Validated non-zero exit codes on protected path violations.
+- [x] ShellCheck clean with zero warnings under standard CI.

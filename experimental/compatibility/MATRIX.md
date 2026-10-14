@@ -1,5 +1,9 @@
 # Universal Linux Housekeeping - Compatibility Matrix
 
+**Author**: Zarrotox  
+**Branch**: `universal-dev` (Experimental Framework)  
+**Reference Baseline**: CachyOS / Arch Linux Production Suite (`cachyos-housekeeping.sh` on `main`)  
+
 This matrix categorizes the portability of housekeeping features across supported distribution families.
 
 ## Portability Classification Table

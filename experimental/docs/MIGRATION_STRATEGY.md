@@ -1,4 +1,8 @@
-# Migration Strategy: From CachyOS Suite to Universal Linux Housekeeping
+# Migration Strategy: Universal Linux Housekeeping Framework
+
+**Author**: Zarrotox  
+**Branch**: `universal-dev` (Experimental Framework)  
+**Reference Baseline**: CachyOS / Arch Linux Production Suite (`cachyos-housekeeping.sh` on `main`)  
 
 This document outlines the systematic strategy for expanding the production CachyOS Housekeeping Suite into a modular, multi-distribution framework.
 
